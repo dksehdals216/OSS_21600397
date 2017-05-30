@@ -18,11 +18,9 @@ tsp.tar is given file for demonstration.
 #include <unistd.h>
 #include <sys/types.h>
 #include <errno.h>
-#include "zlib.h"
 #include <string.h>
 
 #define BUFFERSIZE 1000
-#define LENGTH 0x1000
 
 void unix_error(char *msg)
 {
@@ -40,46 +38,6 @@ pid_t Fork(void)	//Wrapper function to call error for Fork
         if ((pid = fork()) < 0)
                 unix_error("Fork error");
         return pid;
-}
-void decomp(char* text)
-{
-	char* file_name = text;
-	gzFile * file;
-    	file = gzopen (file_name, "r");
-    	if (! file) 
-	{
-        	fprintf (stderr, "gzopen of '%s' failed: %s.\n", file_name,
-			strerror (errno));
-            	exit (EXIT_FAILURE);
-    	}
-    	while (1) 
-	{
-        	int err;                    
-	        int bytes_read;
-	        unsigned char buffer[LENGTH];
-       		bytes_read = gzread (file, buffer, LENGTH - 1);
-        	buffer[bytes_read] = '\0';
-        	printf ("%s", buffer);
-        	if (bytes_read < LENGTH - 1) 
-		{
-            		if (gzeof (file)) 
-			{
-                		break;
-            		}
-            	else 
-		{
-                	const char * error_string;
-                	error_string = gzerror (file, & err);
-                	if (err) 
-			{
-                    	fprintf (stderr, "Error: %s.\n", error_string);
-                    	exit (EXIT_FAILURE);
-                	}
-            	}
-        	}
-    }
-    gzclose (file);
-
 }
 
 int main(int argc, char *argv[])
