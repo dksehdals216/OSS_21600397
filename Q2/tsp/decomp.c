@@ -20,7 +20,8 @@ tsp.tar is given file for demonstration.
 #include <errno.h>
 #include <string.h>
 
-#define BUFFERSIZE 141
+#define BUFFERSIZE 80
+#define FILE_S 12
 
 void unix_error(char *msg)
 {
@@ -51,37 +52,54 @@ int main(int argc, char *argv[])
     		fp = fopen(argv[1], "r");
 		int lcounter = 0;	//loop counter that keeps track of # of childs
 		int i, row, col;
+		char str[80];		
 		
+		pid_t pids[FILE_S];		
+		int n = FILE_S;
 		    /* Initializing array */
-    		for (row = 0; row < BUFFERSIZE; row++) 
+    		for (row = 0; row < FILE_S; row++) 
 		{
         	    	buffer[row] = "  ";
         		
 		}
 
 		/* Reading file into array */
-		for (row = 0; row < BUFFERSIZE; row++) 
+		for (row = 0; row < FILE_S; row++) 
 		{
        			if (fgets(c_buffer, BUFFERSIZE, fp))
           			buffer[row] = strdup(c_buffer);
     		}
 
 		/* Printing array */
-    		for (row = 0; row < BUFFERSIZE; row++) 
+    		for (row = 0; row < FILE_S; row++) 
 		{
-            		printf("%s", buffer[row]);
-			execlp("gunzip", "gunzip", buffer[row], NULL);
-    		}		
-/*
-		while (fgets(buffer, sizeof(buffer), fp) != NULL)
-		{
-			//char str[80];
-			printf("%s", buffer);
-			//sprintf(str, "/home/s21600397/OSS_21600397/Q2/tsp/%s", buffer); 
-			execlp("gunzip", "gunzip", buffer, NULL);
-			lcounter++;
-		}*/	 
+			if ((pids[row] = Fork()) < 0)
+			{
+				perror("Error caused by fork");
+				abort();
+			}
+			else if (pids[row] == 0)
+			{
+				
+            			printf("%s", buffer[row]);
+				sprintf(str, "gunzip %s", buffer[row]);
+			//printf("%s", str);
+				system(str);
+			//execlp("gunzip", "gunzip", buffer[row], NULL);
+				exit(0);
+			}
+    		}			 
         	fclose(fp);
+
+		//Exiting Child
+		int status;
+		pid_t pid;
+		while( n > 0)
+		{
+			pid = wait(&status);
+			printf("Child with PID%ld exited with status 0x%x. \n", (long)pid, status);
+			--n;
+		}
 	}
 	else	//if there is no argument, return an error
 	{
