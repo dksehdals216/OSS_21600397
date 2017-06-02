@@ -44,18 +44,20 @@ pid_t Fork(void)	//Wrapper function to call error for Fork
 int main(int argc, char *argv[])
 {
 
-	if(argc > 1)	//Checks whether if there is at least one argument
+	if(argc == 1)	//Checks whether if there is at least one argument
 	{
-		char const* const file_n = argv[1];	//filename is first argument
+			//filename is first argument
 		FILE* fp;
 		char c_buffer[BUFFERSIZE], *buffer[BUFFERSIZE];
-    		fp = fopen(argv[1], "r");
+    		fp = stdin;
 		int lcounter = 0;	//loop counter that keeps track of # of childs
 		int i, row, col;
 		char str[80];		
 		
 		pid_t pids[FILE_S];		
 		int n = FILE_S;
+		
+	
 		    /* Initializing array */
     		for (row = 0; row < FILE_S; row++) 
 		{
@@ -66,7 +68,7 @@ int main(int argc, char *argv[])
 		/* Reading file into array */
 		for (row = 0; row < FILE_S; row++) 
 		{
-       			if (fgets(c_buffer, BUFFERSIZE, fp))
+       			if (fgets(c_buffer, BUFFERSIZE, stdin))
           			buffer[row] = strdup(c_buffer);
     		}
 

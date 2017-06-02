@@ -66,6 +66,31 @@ int main() {
 	}
 	fclose(fp) ;
 
-	for (i = 0  ; i < 17 ; i++) 
-		travel(i) ;
+	pid_t pid;
+	
+	
+	for (i = 0  ; i < 17 ; i++)
+	{ 
+		if ((pid = fork) < 0)
+		{
+			perror("Error fork");
+			abort();
+		}
+		else if (pid == 0)
+		{
+			travel(i);	
+		}
+		
+	}
+	//Exiting Child
+        int status;
+        pid_t pid;
+	int n = 17;
+        while( n > 0)
+        {
+                pid = wait(&status);
+                printf("Child with PID%ld exited with status 0x%x. \n", (long)pid, status);
+                --n;
+        }
+
 }
